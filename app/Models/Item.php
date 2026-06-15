@@ -12,12 +12,19 @@ class Item extends Model
     protected $fillable = [
         'name',
         'description',
+        'admin_details',
         'found_date',
         'image_path',
         'location_id',
         'category_id',
         'status',
-        'user_id'
+        'user_id',
+        'contact_phone',
+    ];
+
+    protected $hidden = [
+        'contact_phone',
+        'admin_details',
     ];
 
     public function location()

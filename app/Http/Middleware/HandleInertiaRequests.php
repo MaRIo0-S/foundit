@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Claim;
+use App\Services\NotificationInboxService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -38,9 +40,19 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user()?->only('id', 'name', 'email'),
+                'user' => $request->user()?->only('id', 'name', 'email', 'created_at'),
                 'role' => $request->user()?->role,
+                'is_admin' => $request->user()?->isAdmin() ?? false,
             ],
+            'adminNav' => fn () => $request->user()?->isAdmin()
+                ? ['pendingClaims' => Claim::where('status', 'pending')->count()]
+                : null,
+            'notifications' => fn () => $request->user()
+                ? app(NotificationInboxService::class)->inboxFor($request->user())->values()
+                : [],
+            'unreadNotifications' => fn () => $request->user()
+                ? app(NotificationInboxService::class)->unreadCount($request->user())
+                : 0,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

@@ -9,10 +9,23 @@ class Notification extends Model
     protected $table = 'notifications';
     
     protected $fillable = [
+        'type',
+        'title',
         'message',
         'is_read',
-        'user_id'
+        'read_at',
+        'user_id',
+        'related_type',
+        'related_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_read' => 'boolean',
+            'read_at' => 'datetime',
+        ];
+    }
 
     public function user()
     {

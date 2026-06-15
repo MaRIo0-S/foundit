@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ItemSeeder::class,
             ClaimSeeder::class,
-            NotificationSeeder::class,
+            AuditLogSeeder::class,
         ]);
     }
-}
+}    

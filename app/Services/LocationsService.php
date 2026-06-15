@@ -8,12 +8,11 @@ use Illuminate\Support\Facades\Request;
 
 class LocationsService
 {
-    public function __construct(){}
-
-    public function locations(){
-        $locations = Location::all();
-        return $locations;
+    public function locations()
+    {
+        return Location::all();
     }
+
     public function location($id)
     {
         $location = Location::findOrFail($id);
@@ -21,7 +20,11 @@ class LocationsService
         $items = Item::where('location_id', $id)
             ->with(['category:id,name'])
             ->search(Request::input('search'))
-            ->status(Request::input('status'))
+            ->when(
+                Request::input('status'),
+                fn ($q, $status) => $q->where('status', $status),
+                fn ($q) => $q->where('status', 'available'),
+            )
             ->sortDate(Request::input('sort_date'))
             ->paginate(3)
             ->withQueryString();

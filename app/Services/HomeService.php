@@ -8,15 +8,18 @@ use App\Models\User;
 
 class HomeService
 {
-    public function __construct(){}
-    public function users(){
+    public function users(): int
+    {
         return User::count();
     }
-    public function claims(){
+
+    public function claims(): int
+    {
         return Claim::count();
     }
 
-    public function items(){
+    public function items(): int
+    {
         return Item::count();
     }
 }

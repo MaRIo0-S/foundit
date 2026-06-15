@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Web\Routing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Claim;
 use App\Models\Item;
 use App\Services\CategoriesService;
@@ -11,7 +10,6 @@ use App\Services\HomeService;
 use App\Services\ItemsService;
 use App\Services\LocationsService;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class RoutingController extends Controller
@@ -63,10 +61,16 @@ class RoutingController extends Controller
         $items = $this->itemsService->Items();
         $categories = $this->categoriesService->categories();
         $locations = $this->locationsService->locations();
+
+        $userClaims = auth()->check()
+            ? Claim::where('user_id', auth()->id())->get(['item_id', 'status'])
+            : collect();
+
         return Inertia::render('Dashboard', [
             'items' => $items,
             'categories' => $categories,
-            'locations' => $locations
+            'locations' => $locations,
+            'userClaims' => $userClaims,
         ]);
     }
 
@@ -111,13 +115,24 @@ class RoutingController extends Controller
         ]);
     }
     public function claimModify(Claim $claim){
+        $claim->load(['item.category', 'item.location']);
+        $claim->makeVisible(['contact_phone']);
+
         return Inertia::render('User/ModifyReclamation',[
             'reclamation' => $claim
         ]);
     }
     public function declarationModify(Item $item){
+        if (in_array($item->status, ['claimed', 'returned'], true)
+            || $item->claims()->where('status', 'approved')->exists()) {
+            return redirect()
+                ->route('profile.declarations')
+                ->with('error', 'Cette déclaration est verrouillée et ne peut plus être modifiée.');
+        }
+
         $categories = $this->categoriesService->categories();
         $locations = $this->locationsService->locations();
+        $item->makeVisible(['contact_phone', 'admin_details']);
         return Inertia::render('User/ModifyDeclaration',[
             'declaration' => $item,
             'categories' => $categories,

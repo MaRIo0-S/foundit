@@ -2,6 +2,7 @@
 import { useForm, usePage, router } from "@inertiajs/vue3";
 import { computed } from "vue";
 import MainLayout from "../../layouts/MainLayout.vue";
+import PasswordInput from "../../components/ui/PasswordInput.vue";
 import { route } from "ziggy-js";
 
 defineOptions({
@@ -140,22 +141,13 @@ function getInitials(name) {
                         <label class="form-group__label" for="current_password">
                             Mot de passe actuel
                         </label>
-                        <div
-                            class="form-group__input-wrap"
-                            :class="{
-                                'is-error': form.errors.current_password,
-                            }"
-                        >
-                            <i class="material-symbols-rounded">lock</i>
-                            <input
-                                id="current_password"
-                                type="password"
-                                class="form-group__input"
-                                v-model="form.current_password"
-                                placeholder="Requis pour changer de mot de passe"
-                                autocomplete="current-password"
-                            />
-                        </div>
+                        <PasswordInput
+                            id="current_password"
+                            v-model="form.current_password"
+                            :has-error="!!form.errors.current_password"
+                            placeholder="Requis pour changer de mot de passe"
+                            autocomplete="current-password"
+                        />
                         <p
                             v-if="form.errors.current_password"
                             class="form-group__error"
@@ -170,24 +162,13 @@ function getInitials(name) {
                             <label class="form-group__label" for="new_password">
                                 Nouveau mot de passe
                             </label>
-                            <div
-                                class="form-group__input-wrap"
-                                :class="{
-                                    'is-error': form.errors.new_password,
-                                }"
-                            >
-                                <i class="material-symbols-rounded"
-                                    >lock_reset</i
-                                >
-                                <input
-                                    id="new_password"
-                                    type="password"
-                                    class="form-group__input"
-                                    v-model="form.new_password"
-                                    placeholder="••••••••"
-                                    autocomplete="new-password"
-                                />
-                            </div>
+                            <PasswordInput
+                                id="new_password"
+                                v-model="form.new_password"
+                                :has-error="!!form.errors.new_password"
+                                icon="lock_reset"
+                                autocomplete="new-password"
+                            />
                             <p
                                 v-if="form.errors.new_password"
                                 class="form-group__error"
@@ -204,19 +185,12 @@ function getInitials(name) {
                             >
                                 Confirmation
                             </label>
-                            <div class="form-group__input-wrap">
-                                <i class="material-symbols-rounded"
-                                    >lock_reset</i
-                                >
-                                <input
-                                    id="new_password_confirmation"
-                                    type="password"
-                                    class="form-group__input"
-                                    v-model="form.new_password_confirmation"
-                                    placeholder="••••••••"
-                                    autocomplete="new-password"
-                                />
-                            </div>
+                            <PasswordInput
+                                id="new_password_confirmation"
+                                v-model="form.new_password_confirmation"
+                                icon="lock_reset"
+                                autocomplete="new-password"
+                            />
                         </div>
                     </div>
                 </div>

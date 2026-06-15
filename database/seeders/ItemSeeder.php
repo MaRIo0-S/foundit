@@ -2,107 +2,329 @@
 
 namespace Database\Seeders;
 
+use App\Models\Item;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class ItemSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        $users = User::pluck('id', 'email');
+
+        $declarantPhones = [
+            'marc.lefebvre@lycee-demo.fr' => '06 11 22 33 44',
+            'sophie.martin@lycee-demo.fr' => '06 22 33 44 55',
+            'marie.leroy@lycee-demo.fr' => '06 33 44 55 66',
+            'elodie.bernard@lycee-demo.fr' => '06 44 55 66 77',
+            'jp.moreau@lycee-demo.fr' => '06 55 66 77 88',
+            'thomas.dupont@lycee-demo.fr' => '06 66 77 88 99',
+        ];
+
         $items = [
             [
+                'declarant' => 'marc.lefebvre@lycee-demo.fr',
                 'category_id' => 1,
-                'location_id' => 1,
+                'location_id' => 7,
                 'name' => 'iPhone 13 Noir',
-                'description' => 'Trouvé sur une chaise de la réception avec une coque transparente et un écran fissuré dans le coin supérieur gauche.',
-                'found_date' => '2026-06-01',
+                'description' => 'Trouvé sur le comptoir du secrétariat avec une coque transparente et un écran fissuré dans le coin supérieur gauche.',
+                'found_date' => '2026-05-15',
                 'image_path' => 'items/iphone13.jpg',
                 'status' => 'available',
-                'user_id' => 1
+                'created_at' => '2026-05-15 09:30:00',
             ],
             [
-                'category_id' => 2,
-                'location_id' => 6,
-                'name' => 'Trousseau de clés de voiture',
-                'description' => 'Un trousseau comprenant une clé de marque Peugeot, une clé de maison classique et un porte-clé jeton de caddie.',
-                'found_date' => '2026-06-02',
+                'declarant' => 'elodie.bernard@lycee-demo.fr',
+                'category_id' => 3,
+                'location_id' => 3,
+                'name' => 'Parapluie pliant noir',
+                'description' => 'Oublié sous une table de la cantine depuis plusieurs semaines, toujours non réclamé.',
+                'found_date' => '2026-04-02',
                 'image_path' => null,
                 'status' => 'available',
-                'user_id' => 2
-
+                'created_at' => '2026-04-02 12:00:00',
             ],
             [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
+                'category_id' => 2,
+                'location_id' => 6,
+                'name' => 'Trousseau de clés Peugeot',
+                'description' => 'Clé de voiture Peugeot, clé de maison et porte-clé jeton de caddie, retrouvé dans le hall principal.',
+                'found_date' => '2026-05-20',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-05-20 14:15:00',
+            ],
+            [
+                'declarant' => 'marie.leroy@lycee-demo.fr',
                 'category_id' => 3,
                 'location_id' => 5,
                 'name' => 'Veste de sport Adidas',
-                'description' => 'Veste de survêtement bleue de taille M, oubliée sur les bancs à côté des vestiaires du gymnase.',
-                'found_date' => '2026-05-28',
+                'description' => 'Veste de survêtement bleue taille M, oubliée sur les bancs du gymnase après un cours de sport.',
+                'found_date' => '2026-05-22',
                 'image_path' => 'items/veste_adidas.jpg',
                 'status' => 'claimed',
-                'user_id' => 1
+                'created_at' => '2026-05-22 17:45:00',
             ],
             [
+                'declarant' => 'elodie.bernard@lycee-demo.fr',
                 'category_id' => 4,
                 'location_id' => 4,
                 'name' => 'Carte d’identité nationale',
-                'description' => 'Carte trouvée glissée entre deux étagères de la section des romans. Au nom de Dupont Thomas.',
-                'found_date' => '2026-06-04',
+                'description' => 'Carte glissée entre deux étagères de la section romans. Au nom de Dupont Thomas.',
+                'found_date' => '2026-05-25',
                 'image_path' => null,
                 'status' => 'available',
-                'user_id' => 2
+                'created_at' => '2026-05-25 11:00:00',
             ],
             [
+                'declarant' => 'marc.lefebvre@lycee-demo.fr',
                 'category_id' => 5,
                 'location_id' => 9,
                 'name' => 'Montre connectée Fitbit',
-                'description' => 'Montre avec bracelet en caoutchouc noir, trouvée près des lavabos. La batterie est complètement déchargée.',
-                'found_date' => '2026-05-20',
+                'description' => 'Bracelet caoutchouc noir, trouvé près des lavabos. Batterie déchargée.',
+                'found_date' => '2026-05-18',
                 'image_path' => 'items/fitbit.jpg',
                 'status' => 'returned',
-                'user_id' => 2
+                'created_at' => '2026-05-18 08:20:00',
             ],
             [
+                'declarant' => 'jp.moreau@lycee-demo.fr',
                 'category_id' => 6,
                 'location_id' => 3,
                 'name' => 'Portefeuille en cuir marron',
-                'description' => 'Contient une carte de bus scolaire et une petite somme d’argent en espèces. Trouvé sous une table de la cantine.',
-                'found_date' => '2026-06-05',
+                'description' => 'Contient une carte de bus scolaire et une petite somme en espèces. Trouvé sous une table de la cantine.',
+                'found_date' => '2026-06-01',
                 'image_path' => null,
                 'status' => 'available',
-                'user_id' => 1
-
+                'created_at' => '2026-06-01 12:30:00',
             ],
             [
+                'declarant' => 'marie.leroy@lycee-demo.fr',
                 'category_id' => 7,
                 'location_id' => 1,
                 'name' => 'Manuel de Mathématiques Terminale',
-                'description' => 'Livre scolaire d’algèbre laissé sur une table au fond de la salle 104.',
-                'found_date' => '2026-06-02',
+                'description' => 'Livre d’algèbre laissé sur une table au fond de la salle 104.',
+                'found_date' => '2026-06-03',
                 'image_path' => null,
                 'status' => 'available',
-                'user_id' => 2
-
+                'created_at' => '2026-06-03 16:10:00',
             ],
             [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
                 'category_id' => 1,
                 'location_id' => 4,
                 'name' => 'Écouteurs AirPods Pro',
-                'description' => 'Boîtier de charge contenant les deux écouteurs, retrouvé sans inscription particulière sur une table de travail.',
-                'found_date' => '2026-05-25',
+                'description' => 'Boîtier de charge avec les deux écouteurs, retrouvé sur une table de travail de la bibliothèque.',
+                'found_date' => '2026-05-28',
                 'image_path' => 'items/airpods.jpg',
                 'status' => 'returned',
-                'user_id' => 1
+                'created_at' => '2026-05-28 13:40:00',
+            ],
+            [
+                'declarant' => 'thomas.dupont@lycee-demo.fr',
+                'category_id' => 3,
+                'location_id' => 1,
+                'name' => 'Lunettes de vue noires',
+                'description' => 'Monture noire dans un étui souple bleu, oubliées sur un pupitre en salle 201.',
+                'found_date' => '2026-06-05',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-05 10:05:00',
+            ],
+            [
+                'declarant' => 'jp.moreau@lycee-demo.fr',
+                'category_id' => 2,
+                'location_id' => 7,
+                'name' => 'Badge d’accès personnel',
+                'description' => 'Badge magnétique sans nom visible, trouvé près de l’imprimante du secrétariat.',
+                'found_date' => '2026-06-06',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-06 09:00:00',
+            ],
+            [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
+                'category_id' => 1,
+                'location_id' => 10,
+                'name' => 'Calculatrice Casio fx-92',
+                'description' => 'Calculatrice scientifique grise avec initiales « S.M. » gravées au dos.',
+                'found_date' => '2026-06-08',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-08 15:20:00',
+            ],
+            [
+                'declarant' => 'thomas.dupont@lycee-demo.fr',
+                'category_id' => 3,
+                'location_id' => 2,
+                'name' => 'Écharpe en laine rouge',
+                'description' => 'Écharpe oubliée sur un banc de la cour de récréation par temps froid.',
+                'found_date' => '2026-06-09',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-09 11:50:00',
+            ],
+            [
+                'declarant' => 'elodie.bernard@lycee-demo.fr',
+                'category_id' => 2,
+                'location_id' => 4,
+                'name' => 'Clés de casier bibliothèque',
+                'description' => 'Petit trousseau de deux clés numérotées 14-B, trouvé à l’accueil du CDI.',
+                'found_date' => '2026-06-07',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-07 14:00:00',
+            ],
+            [
+                'declarant' => 'jp.moreau@lycee-demo.fr',
+                'category_id' => 5,
+                'location_id' => 7,
+                'name' => 'Montre Casio classique',
+                'description' => 'Montre à bracelet métal argenté, laissée sur le plan de travail du bureau des admissions.',
+                'found_date' => '2026-05-12',
+                'image_path' => null,
+                'status' => 'returned',
+                'created_at' => '2026-05-12 10:30:00',
+            ],
+            [
+                'declarant' => 'marc.lefebvre@lycee-demo.fr',
+                'category_id' => 9,
+                'location_id' => 5,
+                'name' => 'Bouteille isotherme bleue',
+                'description' => 'Gourde 500 ml avec autocollant « Running Club », trouvée dans le gymnase.',
+                'found_date' => '2026-06-04',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-04 18:00:00',
+            ],
+            [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
+                'category_id' => 7,
+                'location_id' => 8,
+                'name' => 'Cahier spirale A4',
+                'description' => 'Cahier de cours de philosophie avec nom « Martin Sophie » sur la couverture.',
+                'found_date' => '2026-06-10',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-10 08:45:00',
+            ],
+            // Déclarations multiples le même jour (graphique dynamique)
+            [
+                'declarant' => 'thomas.dupont@lycee-demo.fr',
+                'category_id' => 1,
+                'location_id' => 6,
+                'name' => 'Chargeur USB-C',
+                'description' => 'Câble blanc 1 m retrouvé dans le hall principal.',
+                'found_date' => '2026-05-20',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-05-20 10:20:00',
+            ],
+            [
+                'declarant' => 'marc.lefebvre@lycee-demo.fr',
+                'category_id' => 4,
+                'location_id' => 1,
+                'name' => 'Carte étudiant',
+                'description' => 'Carte sans photo au nom illisible, trouvée en salle 104.',
+                'found_date' => '2026-05-20',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-05-20 16:45:00',
+            ],
+            [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
+                'category_id' => 6,
+                'location_id' => 3,
+                'name' => 'Porte-monnaie tissu',
+                'description' => 'Petit porte-monnaie rouge trouvé près des distributeurs.',
+                'found_date' => '2026-06-01',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-01 08:15:00',
+            ],
+            [
+                'declarant' => 'elodie.bernard@lycee-demo.fr',
+                'category_id' => 7,
+                'location_id' => 2,
+                'name' => 'Classeur A4 bleu',
+                'description' => 'Classeur avec intercalaires de cours de SVT.',
+                'found_date' => '2026-06-01',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-01 17:30:00',
+            ],
+            [
+                'declarant' => 'marie.leroy@lycee-demo.fr',
+                'category_id' => 1,
+                'location_id' => 8,
+                'name' => 'Écouteurs filaires',
+                'description' => 'Écouteurs jack 3,5 mm laissés sur un pupitre du CDI.',
+                'found_date' => '2026-06-05',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-05 14:10:00',
+            ],
+            [
+                'declarant' => 'jp.moreau@lycee-demo.fr',
+                'category_id' => 2,
+                'location_id' => 7,
+                'name' => 'Clé USB 16 Go',
+                'description' => 'Clé noire sans étiquette, trouvée au secrétariat.',
+                'found_date' => '2026-06-05',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-05 16:55:00',
+            ],
+            [
+                'declarant' => 'thomas.dupont@lycee-demo.fr',
+                'category_id' => 3,
+                'location_id' => 5,
+                'name' => 'Serviette de sport',
+                'description' => 'Serviette grise retrouvée dans les vestiaires du gymnase.',
+                'found_date' => '2026-06-08',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-08 09:05:00',
+            ],
+            [
+                'declarant' => 'marc.lefebvre@lycee-demo.fr',
+                'category_id' => 5,
+                'location_id' => 4,
+                'name' => 'Montre digitale Casio',
+                'description' => 'Montre résine noire laissée sur une table de la bibliothèque.',
+                'found_date' => '2026-06-08',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-08 11:40:00',
+            ],
+            [
+                'declarant' => 'sophie.martin@lycee-demo.fr',
+                'category_id' => 9,
+                'location_id' => 2,
+                'name' => 'Gourde transparente',
+                'description' => 'Bouteille 750 ml sans bouchon, trouvée dans la cour.',
+                'found_date' => '2026-06-10',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-10 14:30:00',
+            ],
+            [
+                'declarant' => 'elodie.bernard@lycee-demo.fr',
+                'category_id' => 7,
+                'location_id' => 1,
+                'name' => 'Livre de français',
+                'description' => 'Roman « L\'Étranger » annoté, oublié en salle 201.',
+                'found_date' => '2026-06-10',
+                'image_path' => null,
+                'status' => 'available',
+                'created_at' => '2026-06-10 16:15:00',
             ],
         ];
 
-        $now = now();
-
-        $data = array_map(function ($item) use ($now) {
-            return [
+        foreach ($items as $item) {
+            Item::create([
+                'user_id' => $users[$item['declarant']],
                 'category_id' => $item['category_id'],
                 'location_id' => $item['location_id'],
                 'name' => $item['name'],
@@ -110,13 +332,11 @@ class ItemSeeder extends Seeder
                 'found_date' => $item['found_date'],
                 'image_path' => $item['image_path'],
                 'status' => $item['status'],
-                'user_id' => $item['user_id'],
-                'created_at' => $now,
-                'updated_at' => $now,
-                'deleted_at' => null,
-            ];
-        }, $items);
-
-        DB::table('items')->insert($data);
+                'contact_phone' => $declarantPhones[$item['declarant']] ?? '06 12 34 56 78',
+                'admin_details' => $item['admin_details'] ?? ($item['description'] . ' — Détails internes : état constaté à la déclaration, particularités visibles, lieu et contexte de la trouvaille.'),
+                'created_at' => $item['created_at'],
+                'updated_at' => $item['created_at'],
+            ]);
+        }
     }
 }

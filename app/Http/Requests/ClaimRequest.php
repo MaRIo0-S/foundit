@@ -14,17 +14,23 @@ class ClaimRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'claim_notes' => ['required', 'string', 'min:3', 'max:5000'],
+            'claim_notes' => ['required', 'string', 'min:20', 'max:5000'],
+            'contact_phone' => ['required', 'string', 'min:10', 'max:20', 'regex:/^[+0-9][0-9\s.-]{8,18}$/'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'claim_notes.required' => 'Les notes de réclamation sont obligatoires.',
-            'claim_notes.string' => 'Les notes doivent être une chaîne de caractères valide.',
-            'claim_notes.min' => 'Vos explications doivent contenir au moins :min caractères.',
-            'claim_notes.max' => 'Vos explications ne peuvent pas dépasser :max caractères.',
+            'claim_notes.required' => 'La description de votre réclamation est obligatoire.',
+            'claim_notes.string' => 'La description doit être une chaîne de caractères valide.',
+            'claim_notes.min' => 'Détaillez votre réclamation (au moins :min caractères) : éléments distinctifs, circonstances, preuves d\'appartenance…',
+            'claim_notes.max' => 'La description ne peut pas dépasser :max caractères.',
+
+            'contact_phone.required' => 'Votre numéro de téléphone est obligatoire.',
+            'contact_phone.min' => 'Le numéro de téléphone doit contenir au moins :min caractères.',
+            'contact_phone.max' => 'Le numéro de téléphone ne peut pas dépasser :max caractères.',
+            'contact_phone.regex' => 'Le format du numéro de téléphone n\'est pas valide.',
         ];
     }
 }

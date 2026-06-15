@@ -1,7 +1,7 @@
 <script setup>
 import { Link, useForm, router } from "@inertiajs/vue3";
-import { computed } from "vue";
 import MainLink from "../../components/ui/links/MainLink.vue";
+import PasswordInput from "../../components/ui/PasswordInput.vue";
 import RegisterLayout from "../../layouts/RegisterLayout.vue";
 import { route } from "ziggy-js";
 const form = useForm({
@@ -15,9 +15,7 @@ function loginUser() {
         onSuccess: () => {
             form.reset();
         },
-        onError: () => {
-            console.log("error");
-        },
+        onError: () => {},
     });
 }
 defineOptions({ layout: RegisterLayout });
@@ -66,20 +64,12 @@ defineOptions({ layout: RegisterLayout });
                         <label class="form-group__label" for="password"
                             >Mot de passe</label
                         >
-                        <div
-                            class="form-group__input-wrap"
-                            :class="{ 'is-error': form.errors.password }"
-                        >
-                            <i class="material-symbols-rounded">lock</i>
-                            <input
-                                id="password"
-                                class="form-group__input"
-                                type="password"
-                                v-model="form.password"
-                                placeholder="••••••••"
-                                autocomplete="current-password"
-                            />
-                        </div>
+                        <PasswordInput
+                            id="password"
+                            v-model="form.password"
+                            :has-error="!!form.errors.password"
+                            autocomplete="current-password"
+                        />
                         <p
                             v-if="form.errors.password"
                             class="form-group__error"

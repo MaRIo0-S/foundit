@@ -1,7 +1,7 @@
 <script setup>
 import { useForm, router } from "@inertiajs/vue3";
-import { computed } from "vue";
 import MainLink from "../../components/ui/links/MainLink.vue";
+import PasswordInput from "../../components/ui/PasswordInput.vue";
 import RegisterLayout from "../../layouts/RegisterLayout.vue";
 import { route } from "ziggy-js";
 
@@ -15,16 +15,9 @@ const form = useForm({
 function registerUser() {
     form.post(route("auth.register.post"), {
         onSuccess: () => {
-            console.log(
-                "Submitting form with data:",
-                form.name,
-                form.email,
-                form.password,
-                form.password_confirmation,
-            );
             form.reset();
         },
-        onError: (errors) => console.log(errors),
+        onError: () => {},
     });
 }
 
@@ -135,20 +128,12 @@ defineOptions({ layout: RegisterLayout });
                             <label class="form-group__label" for="password"
                                 >Mot de passe</label
                             >
-                            <div
-                                class="form-group__input-wrap"
-                                :class="{ 'is-error': form.errors.password }"
-                            >
-                                <i class="material-symbols-rounded">lock</i>
-                                <input
-                                    id="password"
-                                    class="form-group__input"
-                                    type="password"
-                                    v-model="form.password"
-                                    placeholder="••••••••"
-                                    autocomplete="new-password"
-                                />
-                            </div>
+                            <PasswordInput
+                                id="password"
+                                v-model="form.password"
+                                :has-error="!!form.errors.password"
+                                autocomplete="new-password"
+                            />
                             <p
                                 v-if="form.errors.password"
                                 class="form-group__error"
@@ -164,25 +149,15 @@ defineOptions({ layout: RegisterLayout });
                                 for="password_confirmation"
                                 >Confirmation</label
                             >
-                            <div
-                                class="form-group__input-wrap"
-                                :class="{
-                                    'is-error':
-                                        form.errors.password_confirmation,
-                                }"
-                            >
-                                <i class="material-symbols-rounded"
-                                    >lock_reset</i
-                                >
-                                <input
-                                    id="password_confirmation"
-                                    class="form-group__input"
-                                    type="password"
-                                    v-model="form.password_confirmation"
-                                    placeholder="••••••••"
-                                    autocomplete="new-password"
-                                />
-                            </div>
+                            <PasswordInput
+                                id="password_confirmation"
+                                v-model="form.password_confirmation"
+                                :has-error="
+                                    !!form.errors.password_confirmation
+                                "
+                                icon="lock_reset"
+                                autocomplete="new-password"
+                            />
                             <p
                                 v-if="form.errors.password_confirmation"
                                 class="form-group__error"

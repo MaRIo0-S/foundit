@@ -13,6 +13,7 @@ const props = defineProps({
 
 const form = useForm({
     claim_notes: props.reclamation.claim_notes ?? "",
+    contact_phone: props.reclamation.contact_phone ?? "",
 });
 
 function submitEdit() {
@@ -79,7 +80,29 @@ function submitEdit() {
 
                 <div class="modify-card__divider"></div>
 
+                <div
+                    v-if="reclamation.status !== 'pending'"
+                    class="modify-card__readonly"
+                >
+                    <i class="material-symbols-rounded">info</i>
+                    <p>
+                        Cette réclamation a déjà été traitée et ne peut plus
+                        être modifiée.
+                    </p>
+                    <div
+                        v-if="
+                            reclamation.status === 'rejected' &&
+                            reclamation.rejection_reason
+                        "
+                        class="modify-card__rejection"
+                    >
+                        <strong>Motif du refus :</strong>
+                        {{ reclamation.rejection_reason }}
+                    </div>
+                </div>
+
                 <form
+                    v-else
                     class="modify-form"
                     @submit.prevent="submitEdit"
                     novalidate
@@ -94,6 +117,15 @@ function submitEdit() {
                             <label class="form-group__label" for="claim_notes">
                                 Description de la réclamation
                             </label>
+                            <p class="form-notice">
+                                <i class="material-symbols-rounded">gpp_maybe</i>
+                                <span
+                                    ><strong>Description obligatoire et
+                                    détaillée.</strong> Éléments distinctifs,
+                                    marque, gravures, circonstances — sous peine
+                                    de rejet.</span
+                                >
+                            </p>
                             <div
                                 class="form-group__textarea-wrap"
                                 :class="{ 'is-error': form.errors.claim_notes }"
@@ -112,6 +144,33 @@ function submitEdit() {
                             >
                                 <i class="material-symbols-rounded">error</i>
                                 {{ form.errors.claim_notes }}
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group__label" for="contact_phone">
+                                Numéro de téléphone
+                            </label>
+                            <div
+                                class="form-group__input-wrap"
+                                :class="{ 'is-error': form.errors.contact_phone }"
+                            >
+                                <i class="material-symbols-rounded">call</i>
+                                <input
+                                    id="contact_phone"
+                                    class="form-group__input"
+                                    type="tel"
+                                    v-model="form.contact_phone"
+                                    placeholder="06 12 34 56 78"
+                                    autocomplete="tel"
+                                />
+                            </div>
+                            <p
+                                v-if="form.errors.contact_phone"
+                                class="form-group__error"
+                            >
+                                <i class="material-symbols-rounded">error</i>
+                                {{ form.errors.contact_phone }}
                             </p>
                         </div>
                     </div>
@@ -263,6 +322,46 @@ function submitEdit() {
     &__divider {
         height: 1.5px;
         background-color: rgba(15, 43, 76, 0.06);
+    }
+
+    &__readonly {
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+        padding: 1rem 1.1rem;
+        border-radius: var(--radius-sm);
+        background: rgba(15, 43, 76, 0.03);
+        border: 1px solid rgba(15, 43, 76, 0.08);
+
+        > i {
+            font-size: 1.2rem;
+            color: var(--color-main);
+            opacity: 0.5;
+        }
+
+        p {
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            color: var(--color-text);
+            opacity: 0.65;
+            margin: 0;
+            line-height: 1.5;
+        }
+    }
+
+    &__rejection {
+        font-family: var(--font-body);
+        font-size: 0.8rem;
+        color: #c0392b;
+        line-height: 1.5;
+        padding: 0.65rem 0.75rem;
+        background: rgba(192, 57, 43, 0.06);
+        border-radius: var(--radius-sm);
+
+        strong {
+            display: block;
+            margin-bottom: 0.2rem;
+        }
     }
 }
 

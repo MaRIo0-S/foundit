@@ -58,6 +58,7 @@ class UpdateUserRequest extends FormRequest
             'current_password.required_with' => 'Le mot de passe actuel est requis pour définir un nouveau mot de passe.',
             
             'new_password.confirmed' => 'La confirmation du nouveau mot de passe ne correspond pas.',
+            'new_password.min' => 'Le nouveau mot de passe doit contenir au moins :min caractères.',
         ];
     }
 }

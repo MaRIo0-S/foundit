@@ -13,13 +13,27 @@ defineProps({
 });
 
 const statusMap = {
+    pending: { label: "En attente", color: "claim-status--pending" },
+    approved: { label: "Approuvée", color: "claim-status--approved" },
+    rejected: { label: "Rejetée", color: "claim-status--rejected" },
+};
+
+const itemStatusMap = {
     available: { label: "Disponible", color: "status--available" },
     claimed: { label: "Réclamé", color: "status--claimed" },
     returned: { label: "Restitué", color: "status--returned" },
 };
 
-function getStatus(status) {
+function getClaimStatus(status) {
     return statusMap[status] ?? { label: status, color: "" };
+}
+
+function getItemStatus(status) {
+    return itemStatusMap[status] ?? { label: status, color: "" };
+}
+
+function isPending(reclamation) {
+    return reclamation.status === "pending";
 }
 
 function formatDate(dateStr) {
@@ -116,12 +130,79 @@ onBeforeUnmount(() =>
                             </span>
                         </div>
                         <span
-                            v-if="reclamation.item"
                             class="claim-card__status"
-                            :class="getStatus(reclamation.item.status).color"
+                            :class="getClaimStatus(reclamation.status).color"
                         >
-                            {{ getStatus(reclamation.item.status).label }}
+                            {{ getClaimStatus(reclamation.status).label }}
                         </span>
+                    </div>
+
+                    <div
+                        v-if="reclamation.status === 'approved'"
+                        class="resolved-banner claim-card__resolved"
+                    >
+                        <span class="resolved-banner__icon">
+                            <i class="material-symbols-rounded">verified</i>
+                        </span>
+                        <div class="resolved-banner__content">
+                            <span class="resolved-banner__title"
+                                >Réclamation approuvée — objet restitué</span
+                            >
+                            <p class="resolved-banner__text">
+                                Votre demande a été validée. Contactez le
+                                déclarant pour organiser la récupération de
+                                l'objet.
+                            </p>
+                            <div
+                                v-if="reclamation.declarant_contact_phone"
+                                class="resolved-banner__contact"
+                            >
+                                <i class="material-symbols-rounded">call</i>
+                                <span
+                                    >{{
+                                        reclamation.declarant_name ?? "Déclarant"
+                                    }}
+                                    :
+                                    <a
+                                        :href="`tel:${reclamation.declarant_contact_phone}`"
+                                        >{{
+                                            reclamation.declarant_contact_phone
+                                        }}</a
+                                    ></span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="reclamation.status === 'rejected' && reclamation.rejection_reason"
+                        class="claim-card__feedback claim-card__feedback--error"
+                    >
+                        <i class="material-symbols-rounded">cancel</i>
+                        <div>
+                            <strong>Réclamation refusée</strong>
+                            <p>{{ reclamation.rejection_reason }}</p>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="reclamation.status === 'pending'"
+                        class="claim-card__feedback claim-card__feedback--pending"
+                    >
+                        <i class="material-symbols-rounded">hourglass_top</i>
+                        <div>
+                            <strong>En cours de traitement</strong>
+                            <p class="form-notice form-notice--inline">
+                                <i class="material-symbols-rounded">gpp_maybe</i>
+                                <span
+                                    >Votre description doit être
+                                    <strong>précise et détaillée</strong>
+                                    (éléments distinctifs, marque, gravures,
+                                    circonstances). Une description insuffisante
+                                    entraîne un rejet.</span
+                                >
+                            </p>
+                        </div>
                     </div>
 
                     <div
@@ -153,6 +234,19 @@ onBeforeUnmount(() =>
                             </p>
 
                             <div class="claim-card__meta">
+                                <span
+                                    v-if="reclamation.item"
+                                    class="claim-card__meta-item"
+                                >
+                                    <i class="material-symbols-rounded"
+                                        >inventory_2</i
+                                    >
+                                    Objet :
+                                    {{
+                                        getItemStatus(reclamation.item.status)
+                                            .label
+                                    }}
+                                </span>
                                 <span class="claim-card__meta-item">
                                     <i class="material-symbols-rounded"
                                         >label</i
@@ -186,7 +280,7 @@ onBeforeUnmount(() =>
                             </div>
                         </div>
 
-                        <div class="claim-card__actions">
+                        <div class="claim-card__actions" v-if="isPending(reclamation)">
                             <button
                                 class="claim-card__action-btn claim-card__action-btn--edit"
                                 type="button"
@@ -655,6 +749,82 @@ onBeforeUnmount(() =>
 .status--returned {
     background-color: rgba(15, 43, 76, 0.08);
     color: var(--color-main);
+}
+
+.claim-status--pending {
+    background-color: rgba(232, 65, 10, 0.12);
+    color: #a02d07;
+}
+
+.claim-status--approved {
+    background-color: rgba(39, 174, 96, 0.12);
+    color: #1a6b3c;
+}
+
+.claim-status--rejected {
+    background-color: rgba(192, 57, 43, 0.12);
+    color: #c0392b;
+}
+
+.claim-card__feedback {
+    display: flex;
+    gap: 0.65rem;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1.5px solid rgba(15, 43, 76, 0.05);
+
+    i {
+        font-size: 1.15rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+
+    strong {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+    }
+
+    p {
+        font-family: var(--font-body);
+        font-size: 0.78rem;
+        line-height: 1.5;
+        opacity: 0.75;
+        margin: 0;
+    }
+
+    &--success {
+        background: rgba(39, 174, 96, 0.06);
+        color: #1a6b3c;
+
+        i {
+            color: #27ae60;
+        }
+    }
+
+    &--error {
+        background: rgba(192, 57, 43, 0.06);
+        color: #c0392b;
+
+        i {
+            color: #c0392b;
+        }
+    }
+
+    &--pending {
+        background: rgba(232, 65, 10, 0.05);
+        color: #a02d07;
+
+        i {
+            color: var(--color-secondary);
+        }
+    }
+}
+
+.claim-card__resolved {
+    margin: 0 1.1rem;
+    border-bottom: 1.5px solid rgba(15, 43, 76, 0.05);
 }
 
 .empty-state {

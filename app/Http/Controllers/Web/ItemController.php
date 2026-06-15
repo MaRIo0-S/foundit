@@ -18,16 +18,22 @@ class ItemController extends Controller
     public function declaration(ItemRegisterRequest $request){
         $validated = $request->validated();
         $this->itemsService->declare($validated);
-        return redirect()->route('dashboard')->with('success','the item did declared with success');
-    }
-    public function delete(Item $item){
-        $this->itemsService->delete($item);
-        return redirect()->back()->with('success', 'declaration supprimer avec success');
+
+        return redirect()->route('dashboard')->with('success', 'Objet déclaré avec succès.');
     }
 
-    public function update(ItemRegisterRequest $request, Item $item){
+    public function delete(Item $item)
+    {
+        $this->itemsService->delete($item);
+
+        return redirect()->back()->with('success', 'Déclaration supprimée avec succès.');
+    }
+
+    public function update(ItemRegisterRequest $request, Item $item)
+    {
         $validated = $request->validated();
         $this->itemsService->update($validated, $item);
-        return redirect()->route('profile.declarations')->with('success', 'declaration modifier avec success');
+
+        return redirect()->route('profile.declarations')->with('success', 'Déclaration modifiée avec succès.');
     }
 }

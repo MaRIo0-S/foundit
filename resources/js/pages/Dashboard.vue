@@ -10,6 +10,7 @@ const props = defineProps({
     items: Object,
     categories: Object,
     locations: Object,
+    userClaims: { type: Array, default: () => [] },
 });
 
 defineOptions({
@@ -23,6 +24,7 @@ defineOptions({
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
 const isAuthenticated = computed(() => !!user.value);
+const isAdmin = computed(() => page.props.auth?.is_admin ?? false);
 
 const showLoginAlert = ref(false);
 const showClaimForm = ref(false);
@@ -31,7 +33,7 @@ const claimFormRef = ref(null);
 const loginAlertRef = ref(null);
 const ignoreNextClick = ref(false);
 
-const claimForm = useForm({ claim_notes: "" });
+const claimForm = useForm({ claim_notes: "", contact_phone: "" });
 
 const search = ref(
     new URLSearchParams(window.location.search).get("search") ?? "",
@@ -41,6 +43,9 @@ const sortDate = ref(
 );
 const statusFilter = ref(
     new URLSearchParams(window.location.search).get("status") ?? "",
+);
+const staleFilter = ref(
+    new URLSearchParams(window.location.search).get("stale") === "1",
 );
 
 let searchTimeout = null;
@@ -57,6 +62,7 @@ function applyFilters(page = 1) {
     if (search.value) params.search = search.value;
     if (sortDate.value) params.sort_date = sortDate.value;
     if (statusFilter.value) params.status = statusFilter.value;
+    if (staleFilter.value) params.stale = 1;
     if (page > 1) params.page = page;
     router.get(route("dashboard"), params, {
         preserveScroll: true,
@@ -146,6 +152,31 @@ const statusMap = {
 function getStatus(status) {
     return statusMap[status] ?? { label: status, color: "" };
 }
+
+function getUserClaim(itemId) {
+    return props.userClaims.find((c) => c.item_id === itemId);
+}
+
+function canClaimItem(item) {
+    if (item.status !== "available") return false;
+    if (user.value && item.user_id === user.value.id) return false;
+    const claim = getUserClaim(item.id);
+    if (!claim) return true;
+    return claim.status === "rejected";
+}
+
+function claimButtonLabel(item) {
+    const claim = getUserClaim(item.id);
+    if (user.value && item.user_id === user.value.id) {
+        return "Votre déclaration";
+    }
+    if (item.status === "returned") return "Restitué";
+    if (claim?.status === "pending") return "En attente";
+    if (claim?.status === "approved") return "Approuvée";
+    if (claim?.status === "rejected") return "Réclamer à nouveau";
+    if (item.status === "claimed") return "Réclamé";
+    return "Réclamer";
+}
 </script>
 
 <template>
@@ -208,7 +239,7 @@ function getStatus(status) {
                         </span>
                     </div>
                     <button
-                        v-if="isAuthenticated"
+                        v-if="isAuthenticated && !isAdmin"
                         class="dashboard__declare-btn"
                         type="button"
                         @click="router.visit(route('item.declare'))"
@@ -216,6 +247,12 @@ function getStatus(status) {
                         <i class="material-symbols-rounded">add_circle</i>
                         Déclarer un objet
                     </button>
+                </div>
+
+                <div v-if="staleFilter" class="dashboard__stale-banner">
+                    <i class="material-symbols-rounded">warning</i>
+                    Affichage des objets disponibles non restitués depuis plus
+                    de 30 jours.
                 </div>
 
                 <div class="filters">
@@ -340,24 +377,20 @@ function getStatus(status) {
                             </div>
                         </div>
 
-                        <div class="item-card__footer">
+                        <div class="item-card__footer" v-if="!isAdmin">
                             <button
                                 class="item-card__claim-btn"
                                 :class="{
                                     'item-card__claim-btn--disabled':
-                                        item.status === 'returned',
+                                        !canClaimItem(item),
                                 }"
-                                :disabled="item.status === 'returned'"
+                                :disabled="!canClaimItem(item)"
                                 @click="claimItem(item)"
                             >
                                 <i class="material-symbols-rounded"
                                     >hand_gesture</i
                                 >
-                                {{
-                                    item.status === "returned"
-                                        ? "Restitué"
-                                        : "Réclamer"
-                                }}
+                                {{ claimButtonLabel(item) }}
                             </button>
                         </div>
                     </div>
@@ -459,6 +492,16 @@ function getStatus(status) {
                         <label class="form-group__label">
                             Décrivez votre réclamation
                         </label>
+                        <p class="form-notice">
+                            <i class="material-symbols-rounded">gpp_maybe</i>
+                            <span
+                                ><strong>Description obligatoire et
+                                détaillée.</strong> Mentionnez les éléments
+                                distinctifs, la marque, les gravures et les
+                                circonstances. Une description vague entraîne un
+                                rejet.</span
+                            >
+                        </p>
                         <textarea
                             class="form-group__textarea"
                             v-model="claimForm.claim_notes"
@@ -471,6 +514,33 @@ function getStatus(status) {
                         >
                             <i class="material-symbols-rounded">error</i>
                             {{ claimForm.errors.claim_notes }}
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group__label">
+                            Numéro de téléphone
+                        </label>
+                        <input
+                            class="form-group__input"
+                            type="tel"
+                            v-model="claimForm.contact_phone"
+                            placeholder="06 12 34 56 78"
+                            autocomplete="tel"
+                        />
+                        <p class="form-notice">
+                            <i class="material-symbols-rounded">lock</i>
+                            <span
+                                ><strong>Numéro confidentiel.</strong> Communiqué
+                                au déclarant uniquement après approbation par
+                                l'administration.</span
+                            >
+                        </p>
+                        <p
+                            v-if="claimForm.errors.contact_phone"
+                            class="form-group__error"
+                        >
+                            <i class="material-symbols-rounded">error</i>
+                            {{ claimForm.errors.contact_phone }}
                         </p>
                     </div>
                 </div>
@@ -585,6 +655,25 @@ function getStatus(status) {
         font-size: 0.8rem;
         color: var(--color-text);
         opacity: 0.45;
+    }
+
+    &__stale-banner {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 0.9rem;
+        margin-bottom: 1rem;
+        border-radius: var(--radius-sm);
+        background: rgba(232, 65, 10, 0.08);
+        border: 1px solid rgba(232, 65, 10, 0.2);
+        font-family: var(--font-body);
+        font-size: 0.82rem;
+        color: var(--color-main);
+
+        i {
+            font-size: 1.1rem;
+            color: var(--color-secondary);
+        }
     }
 
     &__declare-btn {
@@ -1376,6 +1465,28 @@ function getStatus(status) {
             border-color: var(--color-main);
             box-shadow: 0 0 0 3px rgba(15, 43, 76, 0.07);
         }
+    }
+
+    &__input {
+        width: 100%;
+        height: 38px;
+        border: 1.5px solid rgba(15, 43, 76, 0.15);
+        border-radius: var(--radius-sm);
+        background-color: var(--color-third);
+        padding: 0 0.75rem;
+        font-family: var(--font-body);
+        font-size: 0.84rem;
+        color: var(--color-text);
+        outline: none;
+    }
+
+    &__hint {
+        font-family: var(--font-body);
+        font-size: 0.68rem;
+        color: var(--color-text);
+        opacity: 0.45;
+        margin: 0;
+        line-height: 1.4;
     }
 
     &__error {

@@ -56,6 +56,14 @@ function confirmDelete() {
     });
 }
 
+function isLocked(declaration) {
+    return (
+        declaration.status === "returned" ||
+        declaration.status === "claimed" ||
+        !!declaration.claimant_contact_phone
+    );
+}
+
 function handleClickOutside(event) {
     if (ignoreNextClick.value) return;
     if (confirmCardRef.value && !confirmCardRef.value.contains(event.target)) {
@@ -122,6 +130,40 @@ onBeforeUnmount(() =>
                         </span>
                     </div>
 
+                    <div
+                        v-if="declaration.claimant_contact_phone"
+                        class="resolved-banner"
+                    >
+                        <span class="resolved-banner__icon">
+                            <i class="material-symbols-rounded">verified</i>
+                        </span>
+                        <div class="resolved-banner__content">
+                            <span class="resolved-banner__title"
+                                >Objet restitué — processus terminé</span
+                            >
+                            <p class="resolved-banner__text">
+                                Une réclamation a été approuvée par
+                                l'administration. Contactez le réclamant pour
+                                finaliser la remise si ce n'est pas déjà fait.
+                            </p>
+                            <div class="resolved-banner__contact">
+                                <i class="material-symbols-rounded">call</i>
+                                <span
+                                    >{{ declaration.claimant_name ?? "Réclamant" }} :
+                                    <a
+                                        :href="`tel:${declaration.claimant_contact_phone}`"
+                                        >{{ declaration.claimant_contact_phone }}</a
+                                    ></span
+                                >
+                            </div>
+                            <span class="resolved-banner__sealed">
+                                <i class="material-symbols-rounded">lock</i>
+                                Déclaration verrouillée — modification
+                                impossible
+                            </span>
+                        </div>
+                    </div>
+
                     <div v-if="declaration" class="declaration-card__body">
                         <div
                             class="declaration-card__image-wrap"
@@ -172,7 +214,10 @@ onBeforeUnmount(() =>
                             </div>
                         </div>
 
-                        <div class="declaration-card__actions">
+                        <div
+                            v-if="!isLocked(declaration)"
+                            class="declaration-card__actions"
+                        >
                             <button
                                 class="declaration-card__action-btn declaration-card__action-btn--edit"
                                 type="button"
@@ -284,6 +329,11 @@ onBeforeUnmount(() =>
 </template>
 
 <style lang="scss" scoped>
+.declaration-card .resolved-banner {
+    margin: 0 0 0.85rem;
+    border-bottom: 1.5px solid rgba(15, 43, 76, 0.06);
+}
+
 .declarations-page {
     flex: 1;
     padding: 2rem 1.5rem;

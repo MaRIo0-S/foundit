@@ -10,9 +10,25 @@ class Claim extends Model
     
     protected $fillable = [
         'claim_notes',
+        'contact_phone',
+        'status',
         'item_id',
-        'user_id'
+        'user_id',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
     ];
+
+    protected $hidden = [
+        'contact_phone',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'reviewed_at' => 'datetime',
+        ];
+    }
 
     public function item()
     {
@@ -22,5 +38,10 @@ class Claim extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

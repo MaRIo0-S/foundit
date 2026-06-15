@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\Auth\AuthController;
 use App\Http\Controllers\Web\ClaimsController;
 use App\Http\Controllers\Web\ItemController;
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\Routing\RoutingController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,10 +22,7 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::post('/claim/store/{item}', [ClaimsController::class, 'store'])->name('claims.store');
-    
-    Route::get('/declare/store', [RoutingController::class, 'declaration'])->name('item.declare');
-    Route::post('/declare/store', [ItemController::class, 'declaration'])->name('item.declare.post');
+    Route::post('/notifications/mark-read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
 
     Route::get('/profile/edit', [RoutingController::class, 'profileEdit'])->name('profile.edit');
     Route::patch('/profile/edit', [AuthController::class, 'modify'])->name('profile.edit.post');
@@ -32,13 +30,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/reclamations', [RoutingController::class, 'profileReclamations'])->name('profile.reclamations');
     Route::get('/profile/declarations', [RoutingController::class, 'profileDeclarations'])->name('profile.declarations');
 
-    Route::delete('/profile/declarations/{item}', [ItemController::class, 'delete'])->name("items.destroy");
-    Route::delete('/profile/reclamations/{claim}', [ClaimsController::class, 'delete'])->name("claims.destroy");
+    Route::middleware(['user.only'])->group(function () {
+        Route::post('/claim/store/{item}', [ClaimsController::class, 'store'])->name('claims.store');
 
-    Route::get('/profile/declarations/edit/{item}', [RoutingController::class, 'declarationModify'])->name('declaration.modify');
-    Route::get('/profile/reclamations/edit/{claim}', [RoutingController::class, 'claimModify'])->name('claim.modify');
+        Route::get('/declare/store', [RoutingController::class, 'declaration'])->name('item.declare');
+        Route::post('/declare/store', [ItemController::class, 'declaration'])->name('item.declare.post');
 
-    Route::post('/profile/declarations/{item}', [ItemController::class, 'update'])->name("items.update");
-    Route::patch('/profile/reclamations/{claim}', [ClaimsController::class, 'update'])->name("claims.update");
+        Route::delete('/profile/declarations/{item}', [ItemController::class, 'delete'])->name('items.destroy');
+        Route::delete('/profile/reclamations/{claim}', [ClaimsController::class, 'delete'])->name('claims.destroy');
 
+        Route::get('/profile/declarations/edit/{item}', [RoutingController::class, 'declarationModify'])->name('declaration.modify');
+        Route::get('/profile/reclamations/edit/{claim}', [RoutingController::class, 'claimModify'])->name('claim.modify');
+
+        Route::post('/profile/declarations/{item}', [ItemController::class, 'update'])->name('items.update');
+        Route::patch('/profile/reclamations/{claim}', [ClaimsController::class, 'update'])->name('claims.update');
+    });
 });

@@ -47,6 +47,6 @@ class AuthController extends Controller{
     public function modify(UpdateUserRequest $request)
     {
         $this->authService->update($request->validated());
-        return redirect()->route('dashboard')->with('success', 'profile a ete modifier avec success');
+        return redirect()->route('dashboard')->with('success', 'Profil modifié avec succès.');
     }
 }

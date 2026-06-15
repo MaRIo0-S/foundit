@@ -19,11 +19,20 @@ defineOptions({
 const form = useForm({
     name: item.value?.name ?? "",
     description: item.value?.description ?? "",
+    admin_details: item.value?.admin_details ?? "",
     found_date: item.value?.found_date ?? "",
     image_path: null,
     category_id: item.value?.category_id ?? "",
     location_id: item.value?.location_id ?? "",
+    contact_phone: item.value?.contact_phone ?? "",
 });
+
+const maxFoundDate = new Date().toISOString().split("T")[0];
+const minFoundDate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 1);
+    return d.toISOString().split("T")[0];
+})();
 
 function handleImage(e) {
     if (e.target.files.length > 0) {
@@ -103,7 +112,7 @@ function storeItem() {
 
                         <div class="form-group">
                             <label class="form-group__label" for="description">
-                                Description
+                                Description publique
                             </label>
                             <div
                                 class="form-group__textarea-wrap"
@@ -113,8 +122,8 @@ function storeItem() {
                                     id="description"
                                     class="form-group__textarea"
                                     v-model="form.description"
-                                    placeholder="Décrivez l'objet, sa couleur, son état, tout détail utile..."
-                                    rows="4"
+                                    placeholder="Résumé court visible par tous"
+                                    rows="3"
                                 ></textarea>
                             </div>
                             <p
@@ -123,6 +132,66 @@ function storeItem() {
                             >
                                 <i class="material-symbols-rounded">error</i>
                                 {{ form.errors.description }}
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group__label" for="admin_details">
+                                Message détaillé pour l'administration
+                            </label>
+                            <div
+                                class="form-group__textarea-wrap"
+                                :class="{ 'is-error': form.errors.admin_details }"
+                            >
+                                <textarea
+                                    id="admin_details"
+                                    class="form-group__textarea"
+                                    v-model="form.admin_details"
+                                    placeholder="Détails réservés à l'admin : état, marque, particularités…"
+                                    rows="5"
+                                ></textarea>
+                            </div>
+                            <p class="form-notice">
+                                <i class="material-symbols-rounded">admin_panel_settings</i>
+                                <span
+                                    ><strong>Strictement réservé à
+                                    l'administration.</strong> Ne sera jamais
+                                    affiché dans le catalogue public.</span
+                                >
+                            </p>
+                            <p
+                                v-if="form.errors.admin_details"
+                                class="form-group__error"
+                            >
+                                <i class="material-symbols-rounded">error</i>
+                                {{ form.errors.admin_details }}
+                            </p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-group__label" for="contact_phone">
+                                Numéro de téléphone
+                            </label>
+                            <div
+                                class="form-group__input-wrap"
+                                :class="{ 'is-error': form.errors.contact_phone }"
+                            >
+                                <i class="material-symbols-rounded">call</i>
+                                <input
+                                    id="contact_phone"
+                                    class="form-group__input"
+                                    type="tel"
+                                    v-model="form.contact_phone"
+                                    placeholder="06 12 34 56 78"
+                                    autocomplete="tel"
+                                />
+                            </div>
+                            <p
+                                v-if="form.errors.contact_phone"
+                                class="form-group__error"
+                            >
+                                <i class="material-symbols-rounded">error</i>
+                                {{ form.errors.contact_phone }}
                             </p>
                         </div>
 
@@ -142,6 +211,8 @@ function storeItem() {
                                     class="form-group__input"
                                     type="date"
                                     v-model="form.found_date"
+                                    :min="minFoundDate"
+                                    :max="maxFoundDate"
                                 />
                             </div>
                             <p
