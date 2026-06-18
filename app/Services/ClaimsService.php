@@ -5,14 +5,12 @@ namespace App\Services;
 use App\Models\Claim;
 use App\Models\Item;
 use App\Services\Admin\NotificationService;
-use App\Services\AuditLogService;
 use Illuminate\Support\Facades\Auth;
 
 class ClaimsService
 {
     public function __construct(
         private NotificationService $notifications,
-        private AuditLogService $auditLog,
     ) {}
 
     public function store(array $data, int $item): bool
@@ -51,12 +49,6 @@ class ClaimsService
             "Nouvelle réclamation sur « {$itemModel->name} ».",
             'claim',
             $claim->id,
-        );
-
-        $this->auditLog->log(
-            'claim.submitted',
-            "Réclamation soumise pour « {$itemModel->name} »",
-            $claim,
         );
 
         return true;

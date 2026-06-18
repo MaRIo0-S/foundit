@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Projet local (non versionné)
+PROJECT_CHANGES.md
+/docs

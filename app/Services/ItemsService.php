@@ -15,10 +15,7 @@ class ItemsService
             ->search(Request::input('search'))
             ->sortDate(Request::input('sort_date'));
 
-        if (Request::boolean('stale')) {
-            $query->where('status', 'available')
-                ->where('created_at', '<', now()->subDays(30));
-        } elseif (Request::input('status')) {
+        if (Request::input('status')) {
             $query->status(Request::input('status'));
         } else {
             $query->where('status', 'available');

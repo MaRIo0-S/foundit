@@ -4,13 +4,12 @@ namespace App\Services\Admin;
 
 use App\Models\Claim;
 use App\Models\User;
-use App\Services\AuditLogService;
+use App\Services\Admin\NotificationService;
 use Illuminate\Support\Facades\DB;
 
 class ClaimWorkflowService
 {
     public function __construct(
-        private AuditLogService $auditLog,
         private NotificationService $notifications,
     ) {}
 
@@ -65,13 +64,6 @@ class ClaimWorkflowService
                 );
             }
 
-            $this->auditLog->log(
-                'claim.approved',
-                "Réclamation #{$claim->id} approuvée et objet « {$itemName} » restitué",
-                $claim,
-                ['item_id' => $claim->item_id],
-            );
-
             return $claim->fresh(['item.category', 'item.location', 'user', 'reviewer']);
         });
     }
@@ -113,13 +105,6 @@ class ClaimWorkflowService
                     $claim->id,
                 );
             }
-
-            $this->auditLog->log(
-                'claim.rejected',
-                "Réclamation #{$claim->id} rejetée",
-                $claim,
-                ['reason' => $reason],
-            );
 
             return $claim->fresh(['item.category', 'item.location', 'user', 'reviewer']);
         });

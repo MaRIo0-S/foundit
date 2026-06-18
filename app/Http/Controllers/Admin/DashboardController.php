@@ -19,9 +19,7 @@ class DashboardController extends Controller
             'itemsByLocation' => $this->dashboard->itemsByLocation(),
             'recentItems' => $this->dashboard->recentItems(),
             'pendingClaims' => $this->dashboard->pendingClaims(),
-            'recentActivity' => $this->dashboard->recentActivity(),
             'declarationsTrend' => $this->dashboard->declarationsTrend(),
-            'staleItems' => $this->dashboard->staleItems(),
         ]);
     }
 }

@@ -44,9 +44,6 @@ const sortDate = ref(
 const statusFilter = ref(
     new URLSearchParams(window.location.search).get("status") ?? "",
 );
-const staleFilter = ref(
-    new URLSearchParams(window.location.search).get("stale") === "1",
-);
 
 let searchTimeout = null;
 
@@ -62,7 +59,6 @@ function applyFilters(page = 1) {
     if (search.value) params.search = search.value;
     if (sortDate.value) params.sort_date = sortDate.value;
     if (statusFilter.value) params.status = statusFilter.value;
-    if (staleFilter.value) params.stale = 1;
     if (page > 1) params.page = page;
     router.get(route("dashboard"), params, {
         preserveScroll: true,
@@ -247,12 +243,6 @@ function claimButtonLabel(item) {
                         <i class="material-symbols-rounded">add_circle</i>
                         Déclarer un objet
                     </button>
-                </div>
-
-                <div v-if="staleFilter" class="dashboard__stale-banner">
-                    <i class="material-symbols-rounded">warning</i>
-                    Affichage des objets disponibles non restitués depuis plus
-                    de 30 jours.
                 </div>
 
                 <div class="filters">
@@ -655,25 +645,6 @@ function claimButtonLabel(item) {
         font-size: 0.8rem;
         color: var(--color-text);
         opacity: 0.45;
-    }
-
-    &__stale-banner {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.65rem 0.9rem;
-        margin-bottom: 1rem;
-        border-radius: var(--radius-sm);
-        background: rgba(232, 65, 10, 0.08);
-        border: 1px solid rgba(232, 65, 10, 0.2);
-        font-family: var(--font-body);
-        font-size: 0.82rem;
-        color: var(--color-main);
-
-        i {
-            font-size: 1.1rem;
-            color: var(--color-secondary);
-        }
     }
 
     &__declare-btn {

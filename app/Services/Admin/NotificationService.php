@@ -30,7 +30,6 @@ class NotificationService
     {
         User::query()
             ->where('role', 'admin')
-            ->where('is_suspended', false)
             ->each(fn (User $user) => $this->send($user, $type, $title, $message, $relatedType, $relatedId));
     }
 }

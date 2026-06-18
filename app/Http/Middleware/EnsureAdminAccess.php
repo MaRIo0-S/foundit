@@ -12,7 +12,7 @@ class EnsureAdminAccess
     {
         $user = $request->user();
 
-        if (!$user || !$user->isAdmin() || $user->is_suspended) {
+        if (!$user || !$user->isAdmin()) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 return response()->json([
                     'message' => 'Accès au back office non autorisé.',

@@ -15,7 +15,6 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'role' => $this->role,
             'is_admin' => $this->isAdmin(),
-            'is_suspended' => (bool) $this->is_suspended,
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

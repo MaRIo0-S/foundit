@@ -46,12 +46,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if ($user->is_suspended) {
-            return response()->json([
-                'message' => 'Ce compte est suspendu.',
-            ], 403);
-        }
-
         $user->tokens()->where('name', 'desktop-client')->delete();
         $token = $user->createToken('desktop-client')->plainTextToken;
 

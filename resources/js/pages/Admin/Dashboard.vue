@@ -11,9 +11,7 @@ defineProps({
     itemsByLocation: Array,
     recentItems: Array,
     pendingClaims: Array,
-    recentActivity: Array,
     declarationsTrend: Array,
-    staleItems: Array,
 });
 
 const maxCategory = (items) =>
@@ -184,51 +182,10 @@ const trendTicks = (trend) => {
                     </li>
                 </ul>
             </section>
-
-            <section
-                class="admin-panel admin-panel--alert"
-                v-if="stats.stale_items > 0"
-            >
-                <div class="admin-panel__head">
-                    <h2 class="admin-panel__title">
-                        <i class="material-symbols-rounded">warning</i>
-                        Objets non restitués &gt; 30 jours
-                    </h2>
-                    <Link
-                        :href="route('dashboard', { stale: 1, status: 'available' })"
-                        class="admin-panel__link"
-                    >
-                        Voir dans le catalogue →
-                    </Link>
-                </div>
-                <p class="admin-panel__alert-text">
-                    <strong>{{ stats.stale_items }}</strong> objet(s)
-                    disponible(s) depuis plus de 30 jours.
-                </p>
-                <table v-if="staleItems.length" class="data-table data-table--compact">
-                    <thead>
-                        <tr>
-                            <th>Objet</th>
-                            <th>Lieu</th>
-                            <th>Déclarant</th>
-                            <th>Ancienneté</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in staleItems" :key="item.id">
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.location }}</td>
-                            <td>{{ item.declarant }}</td>
-                            <td>{{ item.days_old }} jours</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
         </div>
 
-        <div class="admin-grid admin-grid--2 admin-grid--sections">
-            <section class="admin-panel">
-                <div class="admin-panel__head">
+        <section class="admin-panel">
+            <div class="admin-panel__head">
                     <h2 class="admin-panel__title">
                         <i class="material-symbols-rounded">schedule</i>
                         Réclamations en attente
@@ -282,41 +239,7 @@ const trendTicks = (trend) => {
                         </tr>
                     </tbody>
                 </table>
-            </section>
-
-            <section class="admin-panel">
-                <div class="admin-panel__head">
-                    <h2 class="admin-panel__title">
-                        <i class="material-symbols-rounded">history</i>
-                        Activité récente
-                    </h2>
-                </div>
-                <EmptyState
-                    v-if="!recentActivity.length"
-                    icon="history"
-                    title="Aucune activité"
-                    description="Les actions admin apparaîtront ici."
-                />
-                <ul v-else class="activity-feed">
-                    <li
-                        v-for="entry in recentActivity"
-                        :key="entry.id"
-                        class="activity-feed__item"
-                    >
-                        <span class="activity-feed__dot"></span>
-                        <div>
-                            <p class="activity-feed__text">
-                                {{ entry.description }}
-                            </p>
-                            <span class="activity-feed__meta">
-                                {{ entry.user_name }} ·
-                                {{ entry.created_at_human }}
-                            </span>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-        </div>
+        </section>
 
         <section class="admin-panel">
             <div class="admin-panel__head">
@@ -350,17 +273,6 @@ const trendTicks = (trend) => {
 </template>
 
 <style lang="scss" scoped>
-.admin-panel--alert {
-    border-color: rgba(232, 65, 10, 0.2);
-    background: rgba(232, 65, 10, 0.03);
-}
-
-.admin-panel__alert-text {
-    font-family: var(--font-body);
-    font-size: 0.88rem;
-    color: var(--color-text);
-}
-
 .trend-chart {
     display: grid;
     grid-template-columns: 28px 1fr;
@@ -515,16 +427,6 @@ const trendTicks = (trend) => {
     width: 100%;
     border-collapse: collapse;
 
-    &--compact {
-        margin-top: 1rem;
-
-        th,
-        td {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.78rem;
-        }
-    }
-
     th {
         font-family: var(--font-body);
         font-size: 0.68rem;
@@ -553,43 +455,6 @@ const trendTicks = (trend) => {
         font-size: 0.78rem;
         font-weight: 600;
         color: var(--color-secondary);
-    }
-}
-
-.activity-feed {
-    list-style: none;
-
-    &__item {
-        display: flex;
-        gap: 0.75rem;
-        padding: 0.65rem 0;
-        border-bottom: 1px solid rgba(15, 43, 76, 0.05);
-
-        &:last-child {
-            border-bottom: none;
-        }
-    }
-
-    &__dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--color-secondary);
-        margin-top: 0.35rem;
-        flex-shrink: 0;
-    }
-
-    &__text {
-        font-family: var(--font-body);
-        font-size: 0.82rem;
-        color: var(--color-text);
-        line-height: 1.4;
-    }
-
-    &__meta {
-        font-size: 0.72rem;
-        color: var(--color-text);
-        opacity: 0.4;
     }
 }
 </style>
